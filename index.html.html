@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>事業成長パートナー診断</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for Inter font and body background */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to right bottom, #e0f2fe, #bfdbfe); /* Soft blue gradient */
+            min-height: 100vh; /* Ensure full viewport height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem; /* Add some padding around the content */
+        }
+        /* Enhanced main container styling */
+        .main-container {
+            background-color: #ffffff;
+            padding: 2.5rem; /* Increased padding */
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* Stronger shadow */
+            width: 100%;
+            max-width: 48rem; /* Increased max-width for better desktop view */
+            border: 1px solid #e2e8f0; /* Subtle border */
+        }
+        /* Custom modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.6); /* Darker overlay */
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px); /* Blurred background for modal */
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: auto;
+            padding: 2.5rem; /* Increased padding */
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); /* Even stronger shadow */
+            max-width: 90%;
+            width: 550px; /* Slightly wider modal */
+            text-align: center;
+            position: relative;
+            animation: fadeIn 0.3s ease-out; /* Fade-in animation */
+        }
+        .close-button {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            font-size: 1.75rem; /* Larger close button */
+            cursor: pointer;
+            color: #6b7280; /* gray-500 */
+            transition: color 0.2s ease-in-out;
+        }
+        .close-button:hover {
+            color: #374151; /* gray-700 */
+            transform: rotate(90deg); /* Rotate effect on hover */
+        }
+
+        /* Custom radio/checkbox styling (Tailwind's form-radio/checkbox are good, but we can enhance) */
+        input[type="radio"],
+        input[type="checkbox"] {
+            appearance: none; /* Hide default browser styles */
+            width: 1.25rem; /* Custom size */
+            height: 1.25rem;
+            border: 2px solid #a78bfa; /* Purple border */
+            border-radius: 50%; /* For radio buttons */
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            flex-shrink: 0; /* Prevent shrinking in flex container */
+        }
+
+        input[type="checkbox"] {
+            border-radius: 0.375rem; /* Rounded corners for checkboxes */
+        }
+
+        input[type="radio"]:checked {
+            background-color: #8b5cf6; /* Purple fill when checked */
+            border-color: #8b5cf6;
+        }
+
+        input[type="checkbox"]:checked {
+            background-color: #8b5cf6; /* Purple fill when checked */
+            border-color: #8b5cf6;
+        }
+
+        input[type="radio"]:checked::after {
+            content: '';
+            display: block;
+            width: 0.5rem;
+            height: 0.5rem;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        input[type="checkbox"]:checked::after {
+            content: '\2713'; /* Checkmark unicode character */
+            display: block;
+            color: white;
+            font-size: 0.75rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Animation for modal */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- 診断ページ -->
+        <div id="diagnosisPage">
+            <h1 class="text-4xl font-extrabold text-center text-gray-900 mb-4">事業成長パートナー診断</h1>
+            <p class="text-center text-gray-600 mb-8 text-lg">いくつかの質問に答えて、税理士の同行が必要か、または同行があったほうが良いかを診断します。</p>
+
+            <form id="diagnosisForm" class="space-y-8">
+                <!-- 質問セクション -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+                    <label class="block text-xl font-bold text-gray-800 mb-3">1. 事業承継やM&Aを検討していますか？</label>
+                    <div class="flex flex-wrap gap-6">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q1_biz_succession_ma" value="yes" class="h-5 w-5 rounded-full">
+                            <span class="ml-3 text-gray-700 text-lg">はい</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q1_biz_succession_ma" value="no" class="h-5 w-5 rounded-full" checked>
+                            <span class="ml-3 text-gray-700 text-lg">いいえ</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q1_biz_succession_ma" value="uncertain" class="h-5 w-5 rounded-full">
+                            <span class="ml-3 text-gray-700 text-lg">未定</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+                    <label class="block text-xl font-bold text-gray-800 mb-3">2. 役員借入金・役員貸付金はありますか？</label>
+                    <div class="flex flex-wrap gap-6">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q2_officer_loans" value="yes" class="h-5 w-5 rounded-full">
+                            <span class="ml-3 text-gray-700 text-lg">はい</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q2_officer_loans" value="no" class="h-5 w-5 rounded-full" checked>
+                            <span class="ml-3 text-gray-700 text-lg">いいえ</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q2_officer_loans" value="uncertain" class="h-5 w-5 rounded-full">
+                            <span class="ml-3 text-gray-700 text-lg">不明</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+                    <label class="block text-xl font-bold text-gray-800 mb-3">3. 会社の財務や経営について、外部の専門家（税理士など）に定期的に相談していますか？</label>
+                    <div class="flex flex-wrap gap-6">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q3_external_expert" value="yes" class="h-5 w-5 rounded-full">
+                            <span class="ml-3 text-gray-700 text-lg">はい</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q3_external_expert" value="no" class="h-5 w-5 rounded-full" checked>
+                            <span class="ml-3 text-gray-700 text-lg">いいえ</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+                    <label class="block text-xl font-bold text-gray-800 mb-3">4. 設立から5年未満の会社ですか？</label>
+                    <div class="flex flex-wrap gap-6">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q4_less_than_5_years" value="yes" class="h-5 w-5 rounded-full">
+                            <span class="ml-3 text-gray-700 text-lg">はい</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q4_less_than_5_years" value="no" class="h-5 w-5 rounded-full" checked>
+                            <span class="ml-3 text-gray-700 text-lg">いいえ</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+                    <label class="block text-xl font-bold text-gray-800 mb-3">5. 資金繰りや直近の決算（黒字・赤字）に関して、課題や特別な考慮事項がありますか？</label>
+                    <div class="flex flex-wrap gap-6">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q5_finance_issues" value="yes" class="h-5 w-5 rounded-full">
+                            <span class="ml-3 text-gray-700 text-lg">はい</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q5_finance_issues" value="no" class="h-5 w-5 rounded-full" checked>
+                            <span class="ml-3 text-gray-700 text-lg">いいえ</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q5_finance_issues" value="uncertain" class="h-5 w-5 rounded-full">
+                            <span class="ml-3 text-gray-700 text-lg">不明</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+                    <label class="block text-xl font-bold text-gray-800 mb-3">6. 保険加入の主な目的として、節税や事業承継、退職金準備、相続対策といった税務上のメリットを重視しますか？</label>
+                    <div class="flex flex-wrap gap-6">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q6_tax_benefits_priority" value="yes" class="h-5 w-5 rounded-full">
+                            <span class="ml-3 text-gray-700 text-lg">はい</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q6_tax_benefits_priority" value="no" class="h-5 w-5 rounded-full" checked>
+                            <span class="ml-3 text-gray-700 text-lg">いいえ</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q6_tax_benefits_priority" value="uncertain" class="h-5 w-5 rounded-full">
+                            <span class="ml-3 text-gray-700 text-lg">未定</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+                    <label class="block text-xl font-bold text-gray-800 mb-3">7. 今回の商談で、税務に関する具体的な質問が出ると予想されますか？</label>
+                    <div class="flex flex-wrap gap-6">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q7_expect_tax_q" value="yes" class="h-5 w-5 rounded-full">
+                            <span class="ml-3 text-gray-700 text-lg">はい</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q7_expect_tax_q" value="no" class="h-5 w-5 rounded-full" checked>
+                            <span class="ml-3 text-gray-700 text-lg">いいえ</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+                    <label class="block text-xl font-bold text-gray-800 mb-3">8. 顧客の税務上のメリットを最大限に引き出す提案をしたいですか？</label>
+                    <div class="flex flex-wrap gap-6">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q8_maximize_tax_benefit" value="yes" class="h-5 w-5 rounded-full">
+                            <span class="ml-3 text-gray-700 text-lg">はい</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="q8_maximize_tax_benefit" value="no" class="h-5 w-5 rounded-full" checked>
+                            <span class="ml-3 text-gray-700 text-lg">いいえ</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex justify-center gap-6 mt-10">
+                    <button type="button" id="diagnoseButton" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-purple-300">
+                        診断する
+                    </button>
+                    <button type="button" id="clearButton" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-gray-200">
+                        クリア
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Result Modal (既存のモーダル) -->
+        <div id="resultModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button" id="closeModalButton">&times;</span>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">診断結果</h2>
+                <div id="modalDiagnosisResult" class="text-2xl text-gray-700 font-extrabold mb-4"></div>
+                <div id="modalDiagnosisReason" class="text-gray-700 text-left text-base leading-relaxed"></div>
+                <button type="button" id="closeModalButtonBottom" class="mt-8 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-full shadow-md transition duration-300">
+                    閉じる
+                </button>
+            </div>
+        </div>
+
+        <!-- 結果とお問い合わせ入力ページ -->
+        <div id="resultAndContactPage" class="hidden w-full">
+            <h1 class="text-4xl font-extrabold text-center text-gray-900 mb-4">診断結果とAI診断</h1>
+            <p class="text-center text-gray-600 mb-8 text-lg">以下の診断結果とAI診断をご確認いただき、必要であればご連絡先をご入力ください。</p>
+
+            <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">総合診断結果</h2>
+                <div id="pageDiagnosisResult" class="text-2xl text-gray-700 font-extrabold mb-4"></div>
+                <div id="pageDiagnosisReason" class="text-gray-700 text-left text-base leading-relaxed"></div>
+            </div>
+
+            <!-- AI診断セクション -->
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">AI診断：事業成長のための評価</h2>
+                <div id="aiDiagnosisEvaluations" class="space-y-4">
+                    <!-- AI診断結果がここに動的に挿入されます -->
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <span class="text-lg font-semibold text-gray-800">現時点での保険の加入の必要性</span>
+                        <span id="eval_insurance_necessity" class="text-lg font-bold text-blue-700"></span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <span class="text-lg font-semibold text-gray-800">保険のパートナーの必要性</span>
+                        <span id="eval_partner_necessity" class="text-lg font-bold text-blue-700"></span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <span class="text-lg font-semibold text-gray-800">税務戦略の重要性</span>
+                        <span id="eval_tax_strategy_importance" class="text-lg font-bold text-blue-700"></span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <span class="text-lg font-semibold text-gray-800">事業リスク対策の緊急性</span>
+                        <span id="eval_business_risk_urgency" class="text-lg font-bold text-blue-700"></span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <span class="text-lg font-semibold text-gray-800">専門家連携の有効性</span>
+                        <span id="eval_expert_collaboration_effectiveness" class="text-lg font-bold text-blue-700"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">ご連絡先入力</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="userName" class="block text-lg font-semibold text-gray-700 mb-2">お名前</label>
+                        <input type="text" id="userName" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="例: 山田 太郎">
+                    </div>
+                    <div>
+                        <label for="companyName" class="block text-lg font-semibold text-gray-700 mb-2">会社名</label>
+                        <input type="text" id="companyName" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="例: 株式会社〇〇">
+                    </div>
+                    <div>
+                        <label for="phoneNumber" class="block text-lg font-semibold text-gray-700 mb-2">電話番号</label>
+                        <input type="tel" id="phoneNumber" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="例: 090-1234-5678">
+                    </div>
+                </div>
+                <div class="flex justify-center mt-8">
+                    <button type="button" id="inquiryButton" class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                        お問い合わせ
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- メール送信確認ページ -->
+        <div id="emailConfirmationPage" class="hidden w-full">
+            <h1 class="text-4xl font-extrabold text-center text-gray-900 mb-4">メール送信内容の確認</h1>
+            <p class="text-center text-gray-600 mb-8 text-lg">以下の内容でメールを送信します。ご確認ください。</p>
+
+            <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200 mb-8">
+                <label for="emailContent" class="block text-lg font-semibold text-gray-700 mb-2">送信内容プレビュー:</label>
+                <textarea id="emailContent" rows="15" class="w-full p-4 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-y" readonly></textarea>
+            </div>
+
+            <div class="flex justify-center gap-6">
+                <button type="button" id="sendEmailButton" class="bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-green-300">
+                    メールで送信する
+                </button>
+                <button type="button" id="backToContactFormButton" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-4 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-gray-200">
+                    戻る
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ページ要素の取得
+            const diagnosisPage = document.getElementById('diagnosisPage');
+            const resultAndContactPage = document.getElementById('resultAndContactPage');
+            const emailConfirmationPage = document.getElementById('emailConfirmationPage');
+
+            // 診断ページ要素
+            const diagnoseButton = document.getElementById('diagnoseButton');
+            const clearButton = document.getElementById('clearButton');
+            const diagnosisForm = document.getElementById('diagnosisForm');
+
+            // 結果モーダル要素
+            const resultModal = document.getElementById('resultModal');
+            const closeModalButton = document.getElementById('closeModalButton');
+            const closeModalButtonBottom = document.getElementById('closeModalButtonBottom');
+            const modalDiagnosisResult = document.getElementById('modalDiagnosisResult');
+            const modalDiagnosisReason = document.getElementById('modalDiagnosisReason');
+
+            // 結果とお問い合わせ入力ページ要素
+            const pageDiagnosisResult = document.getElementById('pageDiagnosisResult');
+            const pageDiagnosisReason = document.getElementById('pageDiagnosisReason');
+            const userNameInput = document.getElementById('userName');
+            const companyNameInput = document.getElementById('companyName');
+            const phoneNumberInput = document.getElementById('phoneNumber');
+            const inquiryButton = document.getElementById('inquiryButton');
+
+            // AI診断評価項目
+            const evalInsuranceNecessity = document.getElementById('eval_insurance_necessity');
+            const evalPartnerNecessity = document.getElementById('eval_partner_necessity');
+            const evalTaxStrategyImportance = document.getElementById('eval_tax_strategy_importance');
+            const evalBusinessRiskUrgency = document.getElementById('eval_business_risk_urgency');
+            const evalExpertCollaborationEffectiveness = document.getElementById('eval_expert_collaboration_effectiveness');
+
+
+            // メール送信確認ページ要素
+            const emailContentTextarea = document.getElementById('emailContent');
+            const sendEmailButton = document.getElementById('sendEmailButton');
+            const backToContactFormButton = document.getElementById('backToContactFormButton');
+
+            // グローバル変数で診断結果とフォームの回答を保持
+            let currentDiagnosisResult = '';
+            let currentDiagnosisReason = '';
+            let currentFormAnswers = {};
+            let currentContactInfo = {
+                name: '',
+                company: '',
+                phone: ''
+            };
+            let currentAiEvaluations = {}; // AI診断結果を保持する新しい変数
+
+            // ページ表示を切り替える関数
+            function showPage(pageToShow) {
+                diagnosisPage.classList.add('hidden');
+                resultAndContactPage.classList.add('hidden');
+                emailConfirmationPage.classList.add('hidden');
+
+                pageToShow.classList.remove('hidden');
+            }
+
+            // モーダルを表示する関数
+            function showModal(result, reason) {
+                modalDiagnosisResult.innerHTML = result;
+                modalDiagnosisReason.innerHTML = reason;
+                resultModal.style.display = 'flex'; // Use flex to center content
+            }
+
+            // モーダルを非表示にする関数
+            function hideModal() {
+                resultModal.style.display = 'none';
+            }
+
+            // フォームの回答をすべて取得する関数
+            function getFormAnswers() {
+                const answers = {};
+                const formElements = diagnosisForm.elements;
+                for (let i = 0; i < formElements.length; i++) {
+                    const element = formElements[i];
+                    if (element.name && (element.type === 'radio' || element.type === 'checkbox')) {
+                        if (element.checked) {
+                            if (answers[element.name]) {
+                                // For checkboxes, append values
+                                if (Array.isArray(answers[element.name])) {
+                                    answers[element.name].push(element.value);
+                                } else {
+                                    answers[element.name] = [answers[element.name], element.value];
+                                }
+                            } else {
+                                answers[element.name] = element.value;
+                            }
+                        }
+                    }
+                }
+                return answers;
+            }
+
+            // AI診断の評価ロジック
+            function performAiDiagnosis(answers) {
+                const evaluations = {};
+
+                // 現時点での保険の加入の必要性
+                let insuranceNecessityScore = 0;
+                if (answers.q5_finance_issues === 'yes') insuranceNecessityScore += 2; // 資金繰りや決算に課題
+                if (answers.q6_tax_benefits_priority === 'yes') insuranceNecessityScore += 2; // 税務メリット重視
+                if (answers.q1_biz_succession_ma === 'yes') insuranceNecessityScore += 1; // 事業承継・M&A検討
+                if (answers.q2_officer_loans === 'yes') insuranceNecessityScore += 1; // 役員借入金・貸付金あり
+                evaluations.insuranceNecessity = insuranceNecessityScore >= 3 ? '高い' : (insuranceNecessityScore >= 1 ? '中程度' : '低い');
+
+                // 保険のパートナーの必要性
+                let partnerNecessityScore = 0;
+                if (answers.q7_expect_tax_q === 'yes') partnerNecessityScore += 2; // 税務質問予想
+                if (answers.q8_maximize_tax_benefit === 'yes') partnerNecessityScore += 2; // 税務メリット最大化希望
+                if (answers.q1_biz_succession_ma === 'yes' || answers.q1_biz_succession_ma === 'uncertain') partnerNecessityScore += 1;
+                if (answers.q2_officer_loans === 'yes' || answers.q2_officer_loans === 'uncertain') partnerNecessityScore += 1;
+                evaluations.partnerNecessity = partnerNecessityScore >= 3 ? '高い' : (partnerNecessityScore >= 1 ? '中程度' : '低い');
+
+                // 税務戦略の重要性
+                let taxStrategyScore = 0;
+                if (answers.q6_tax_benefits_priority === 'yes') taxStrategyScore += 2; // 税務メリット重視
+                if (answers.q8_maximize_tax_benefit === 'yes') taxStrategyScore += 2; // 税務メリット最大化希望
+                if (answers.q5_finance_issues === 'yes') taxStrategyScore += 1; // 資金繰りや決算に課題
+                if (answers.q4_less_than_5_years === 'yes') taxStrategyScore += 1; // 設立5年未満
+                evaluations.taxStrategyImportance = taxStrategyScore >= 3 ? '高い' : (taxStrategyScore >= 1 ? '中程度' : '低い');
+
+                // 事業リスク対策の緊急性
+                let businessRiskScore = 0;
+                if (answers.q1_biz_succession_ma === 'yes') businessRiskScore += 2; // 事業承継・M&A検討
+                if (answers.q2_officer_loans === 'yes') businessRiskScore += 2; // 役員借入金・貸付金あり
+                if (answers.q5_finance_issues === 'yes') businessRiskScore += 1; // 資金繰りや決算に課題
+                evaluations.businessRiskUrgency = businessRiskScore >= 3 ? '高い' : (businessRiskScore >= 1 ? '中程度' : '低い');
+
+                // 専門家連携の有効性
+                let expertCollaborationScore = 0;
+                if (answers.q3_external_expert === 'no') { // 外部専門家がいない場合
+                    if (answers.q1_biz_succession_ma === 'yes' || answers.q2_officer_loans === 'yes' || answers.q5_finance_issues === 'yes' || answers.q6_tax_benefits_priority === 'yes') {
+                        expertCollaborationScore += 3; // 複雑な課題があり、専門家がいない
+                    } else {
+                        expertCollaborationScore += 1; // 専門家はいないが、高優先度の課題は少ない
+                    }
+                }
+                evaluations.expertCollaborationEffectiveness = expertCollaborationScore >= 2 ? '高い' : (expertCollaborationScore >= 1 ? '中程度' : '低い');
+
+
+                return evaluations;
+            }
+
+            // メール本文を整形する関数
+            function formatAnswersForEmail(answers, result, reason, contactInfo, aiEvaluations) {
+                let emailBody = `事業成長パートナー診断結果:\n\n`;
+                emailBody += `--- 総合診断結果 ---\n`;
+                emailBody += `診断結果: ${result.replace(/<[^>]*>?/gm, '')}\n`; // Remove HTML tags
+                emailBody += `理由:\n${reason.replace(/<[^>]*>?/gm, '').replace(/• /g, '- ').replace(/<\/?ul>|<\/?li>|<\/?p>/g, '')}\n\n`; // Remove HTML tags and format list
+
+                emailBody += `--- AI診断：事業成長のための評価 ---\n`;
+                emailBody += `現時点での保険の加入の必要性: ${aiEvaluations.insuranceNecessity}\n`;
+                emailBody += `保険のパートナーの必要性: ${aiEvaluations.partnerNecessity}\n`;
+                emailBody += `税務戦略の重要性: ${aiEvaluations.taxStrategyImportance}\n`;
+                emailBody += `事業リスク対策の緊急性: ${aiEvaluations.businessRiskUrgency}\n`;
+                emailBody += `専門家連携の有効性: ${aiEvaluations.expertCollaborationEffectiveness}\n\n`;
+
+
+                emailBody += `--- 回答内容 ---\n`;
+
+                const questionMap = {
+                    'q1_biz_succession_ma': '1. 事業承継やM&Aを検討していますか？',
+                    'q2_officer_loans': '2. 役員借入金・役員貸付金はありますか？',
+                    'q3_external_expert': '3. 会社の財務や経営について、外部の専門家（税理士など）に定期的に相談していますか？',
+                    'q4_less_than_5_years': '4. 設立から5年未満の会社ですか？',
+                    'q5_finance_issues': '5. 資金繰りや直近の決算（黒字・赤字）に関して、課題や特別な考慮事項がありますか？',
+                    'q6_tax_benefits_priority': '6. 保険加入の主な目的として、節税や事業承継、退職金準備、相続対策といった税務上のメリットを重視しますか？',
+                    'q7_expect_tax_q': '7. 今回の商談で、税務に関する具体的な質問が出ると予想されますか？',
+                    'q8_maximize_tax_benefit': '8. 顧客の税務上のメリットを最大限に引き出す提案をしたいですか？'
+                };
+
+                for (const qKey in questionMap) {
+                    if (answers[qKey]) {
+                        emailBody += `${questionMap[qKey]}: ${answers[qKey]}\n`;
+                    }
+                }
+                emailBody += `\n--- ご連絡先 ---\n`;
+                emailBody += `お名前: ${contactInfo.name || '未入力'}\n`;
+                emailBody += `会社名: ${contactInfo.company || '未入力'}\n`;
+                emailBody += `電話番号: ${contactInfo.phone || '未入力'}\n`;
+                emailBody += `\n--------------------\n`;
+                emailBody += `この内容は「事業成長パートナー診断」アプリによって生成されました。`;
+
+                return emailBody;
+            }
+
+            // 診断ボタンのイベントリスナー
+            diagnoseButton.addEventListener('click', () => {
+                let score = 0;
+                let reasons = [];
+
+                // Get selected values for each question
+                const q1_biz_succession_ma = document.querySelector('input[name="q1_biz_succession_ma"]:checked')?.value || 'no';
+                const q2_officer_loans = document.querySelector('input[name="q2_officer_loans"]:checked')?.value || 'no';
+                const q3_external_expert = document.querySelector('input[name="q3_external_expert"]:checked')?.value || 'yes';
+                const q4_less_than_5_years = document.querySelector('input[name="q4_less_than_5_years"]:checked')?.value || 'no';
+                const q5_finance_issues = document.querySelector('input[name="q5_finance_issues"]:checked')?.value || 'no';
+                const q6_tax_benefits_priority = document.querySelector('input[name="q6_tax_benefits_priority"]:checked')?.value || 'no';
+                const q7_expect_tax_q = document.querySelector('input[name="q7_expect_tax_q"]:checked')?.value || 'no';
+                const q8_maximize_tax_benefit = document.querySelector('input[name="q8_maximize_tax_benefit"]:checked')?.value || 'no';
+
+                // --- Diagnostic Logic (for Tax Accountant Accompaniment) ---
+                // High Priority Factors (+3 points each)
+                if (q1_biz_succession_ma === 'yes') { score += 3; reasons.push('事業承継やM&Aを検討しているため'); }
+                if (q2_officer_loans === 'yes') { score += 3; reasons.push('役員借入金・役員貸付金があるため'); }
+                if (q6_tax_benefits_priority === 'yes') { score += 3; reasons.push('節税や事業承継、退職金準備、相続対策といった税務上のメリットを重視しているため'); }
+                if (q7_expect_tax_q === 'yes') { score += 3; reasons.push('税務に関する具体的な質問が出ると予想されるため'); }
+                if (q8_maximize_tax_benefit === 'yes') { score += 3; reasons.push('顧客の税務上のメリットを最大限に引き出す提案をしたいと考えているため'); }
+
+                // Medium Priority Factors (+1 point each)
+                if (q3_external_expert === 'no') { score += 1; reasons.push('会社の財務や経営について、外部の専門家に定期的に相談していないため'); }
+                if (q4_less_than_5_years === 'yes') { score += 1; reasons.push('設立から5年未満の会社であるため'); }
+                if (q5_finance_issues === 'yes') { score += 1; reasons.push('資金繰りや直近の決算に関して課題や特別な考慮事項があるため'); }
+
+                // Determine result based on score
+                let resultText = '';
+                let reasonText = '';
+
+                if (score >= 8) { // Adjusted score threshold for fewer questions
+                    resultText = '<span class="text-red-600 font-extrabold">税理士の同行を強く推奨します！</span>';
+                    reasonText = '<p class="font-bold mb-2">【理由】</p><ul class="list-disc list-inside space-y-1">';
+                    reasons.forEach(reason => {
+                        reasonText += `<li>${reason}</li>`;
+                    });
+                    reasonText += '</ul><p class="mt-4">税務上の複雑な論点が多く、専門家である税理士が同行することで、顧客への信頼性が高まり、より踏み込んだ提案が可能になります。</p>';
+                } else if (score >= 3) { // Adjusted score threshold
+                    resultText = '<span class="text-yellow-600 font-extrabold">税理士の同行を検討した方が良いでしょう。</span>';
+                    reasonText = '<p class="font-bold mb-2">【理由】</p><ul class="list-disc list-inside space-y-1">';
+                    if (reasons.length > 0) {
+                        reasons.forEach(reason => {
+                            reasonText += `<li>${reason}</li>`;
+                        });
+                    } else {
+                        reasonText += '<li>いくつかの要因から、税理士の視点があるとより良い提案ができる可能性があります。</li>';
+                    }
+                    reasonText += '</ul><p class="mt-4">顧客の状況やニーズによっては、税務的な視点からのアドバイスが有効となる場面があります。同行を検討することで、顧客満足度向上につながるでしょう。</p>';
+                } else {
+                    resultText = '<span class="text-green-600 font-extrabold">営業担当者単独でも対応可能です。</span>';
+                    reasonText = '<p class="font-bold mb-2">【理由】</p><ul class="list-disc list-inside space-y-1">';
+                    reasons.forEach(reason => { // 既存の理由を追加
+                        reasonText += `<li>${reason}</li>`;
+                    });
+                    reasonText += '<li>今回の商談では、税務上の複雑な論点が発生する可能性が低いと判断されます。</li>';
+                    reasonText += '</ul><p class="mt-4">基本的な保険提案であれば、ご自身で十分対応できるでしょう。<br>もし保険関係なく、他にお悩み事がありましたらお気軽にご相談ください。</p>'; // 追加した文言
+                }
+
+                currentDiagnosisResult = resultText;
+                currentDiagnosisReason = reasonText;
+                currentFormAnswers = getFormAnswers();
+                currentAiEvaluations = performAiDiagnosis(currentFormAnswers); // AI診断を実行
+
+                showModal(resultText, reasonText);
+            });
+
+            // モーダルを閉じるボタンのイベントリスナー（モーダル内の両方のボタン）
+            closeModalButton.addEventListener('click', () => {
+                hideModal();
+                showPage(resultAndContactPage); // 結果とお問い合わせ入力ページへ遷移
+                pageDiagnosisResult.innerHTML = currentDiagnosisResult; // 結果を再表示
+                pageDiagnosisReason.innerHTML = currentDiagnosisReason; // 理由を再表示
+                
+                // AI診断結果を表示
+                evalInsuranceNecessity.textContent = currentAiEvaluations.insuranceNecessity;
+                evalPartnerNecessity.textContent = currentAiEvaluations.partnerNecessity;
+                evalTaxStrategyImportance.textContent = currentAiEvaluations.taxStrategyImportance;
+                evalBusinessRiskUrgency.textContent = currentAiEvaluations.businessRiskUrgency;
+                evalExpertCollaborationEffectiveness.textContent = currentAiEvaluations.expertCollaborationEffectiveness;
+            });
+            closeModalButtonBottom.addEventListener('click', () => {
+                hideModal();
+                showPage(resultAndContactPage); // 結果とお問い合わせ入力ページへ遷移
+                pageDiagnosisResult.innerHTML = currentDiagnosisResult; // 結果を再表示
+                pageDiagnosisReason.innerHTML = currentDiagnosisReason; // 理由を再表示
+
+                // AI診断結果を表示
+                evalInsuranceNecessity.textContent = currentAiEvaluations.insuranceNecessity;
+                evalPartnerNecessity.textContent = currentAiEvaluations.partnerNecessity;
+                evalTaxStrategyImportance.textContent = currentAiEvaluations.taxStrategyImportance;
+                evalBusinessRiskUrgency.textContent = currentAiEvaluations.businessRiskUrgency;
+                evalExpertCollaborationEffectiveness.textContent = currentAiEvaluations.expertCollaborationEffectiveness;
+            });
+            window.addEventListener('click', (event) => {
+                if (event.target === resultModal) {
+                    hideModal();
+                    showPage(resultAndContactPage); // 結果とお問い合わせ入力ページへ遷移
+                    pageDiagnosisResult.innerHTML = currentDiagnosisResult; // 結果を再表示
+                    pageDiagnosisReason.innerHTML = currentDiagnosisReason; // 理由を再表示
+
+                    // AI診断結果を表示
+                    evalInsuranceNecessity.textContent = currentAiEvaluations.insuranceNecessity;
+                    evalPartnerNecessity.textContent = currentAiEvaluations.partnerNecessity;
+                    evalTaxStrategyImportance.textContent = currentAiEvaluations.taxStrategyImportance;
+                    evalBusinessRiskUrgency.textContent = currentAiEvaluations.businessRiskUrgency;
+                    evalExpertCollaborationEffectiveness.textContent = currentAiEvaluations.expertCollaborationEffectiveness;
+                }
+            });
+
+            // お問い合わせボタンのイベントリスナー
+            inquiryButton.addEventListener('click', () => {
+                // ご連絡先情報を取得
+                currentContactInfo.name = userNameInput.value;
+                currentContactInfo.company = companyNameInput.value;
+                currentContactInfo.phone = phoneNumberInput.value;
+
+                // メール本文を生成してプレビューに設定
+                emailContentTextarea.value = formatAnswersForEmail(
+                    currentFormAnswers,
+                    currentDiagnosisResult,
+                    currentDiagnosisReason,
+                    currentContactInfo,
+                    currentAiEvaluations // AI診断結果を渡す
+                );
+
+                showPage(emailConfirmationPage); // メール送信確認ページへ遷移
+            });
+
+            // メールで送信するボタンのイベントリスナー
+            sendEmailButton.addEventListener('click', () => {
+                const recipientEmail = 'm.kanda@hokkaido-kaikei.net'; // 送信先のメールアドレス
+                const subject = encodeURIComponent('事業成長パートナー診断結果');
+                const body = encodeURIComponent(emailContentTextarea.value);
+                const mailtoLink = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
+                window.location.href = mailtoLink;
+            });
+
+            // 戻るボタンのイベントリスナー（メール送信確認ページから）
+            backToContactFormButton.addEventListener('click', () => {
+                showPage(resultAndContactPage); // 結果とお問い合わせ入力ページへ戻る
+            });
+
+            // クリアボタンのイベントリスナー
+            clearButton.addEventListener('click', () => {
+                diagnosisForm.reset(); // フォームをリセット
+                userNameInput.value = ''; // お名前をクリア
+                companyNameInput.value = ''; // 会社名をクリア
+                phoneNumberInput.value = ''; // 電話番号をクリア
+                hideModal(); // モーダルを非表示
+                showPage(diagnosisPage); // 診断ページに戻る
+                // 全ての保存された情報をクリア
+                currentDiagnosisResult = '';
+                currentDiagnosisReason = '';
+                currentFormAnswers = {};
+                currentContactInfo = { name: '', company: '', phone: '' };
+                currentAiEvaluations = {}; // AI診断結果もクリア
+                emailContentTextarea.value = '';
+            });
+
+            // 初期表示は診断ページ
+            showPage(diagnosisPage);
+        });
+    </script>
+</body>
+</html>
+
